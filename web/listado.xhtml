@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form >
+               <p:toolbar>
+                <f:facet name="left">
+                    <p:outputLabel value="Bienvenido #{login.user}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <p:link outcome="index" value="Inicio"/>
+                        
+                </f:facet>
+                <f:facet name="right">
+                    <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                </f:facet>
+            </p:toolbar>
+            <br></br>
+            <p:dataTable   value="#{fileMb.lisFic}" var="items" rows="20" widgetVar="actasFilter" paginator="true" filteredValue="#{fileMb.filtereFiles}" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,40,60,100" >
+                <f:facet name="header">
+                    <p:outputPanel>
+                        <h:outputText value="Buscar por acta:" />
+                        <p:inputText id="globalFilter" onkeyup="PF('actasFilter').filter()" style="width:150px" placeholder="Ingrese acta"/>
+                    </p:outputPanel>
+                </f:facet>
+                <p:column filterBy="#{items.name}" filterMatchMode="contains" >
+                    <a target="_blank" href="recursos/${items.name}" >#{items.name}</a>                
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
+

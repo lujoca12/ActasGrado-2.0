@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Editar Acta</title>
+    </h:head>
+    <c:choose>
+        <c:when test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+
+            <h:body>
+                <p:growl id="mensajes" showDetail="true" life="2000" />
+                <h:form id="form1">
+                    <p:toolbar>
+                        <f:facet name="left">
+                            <p:outputLabel value="Bienvenido #{login.user}" />
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span> 
+                            <p:link outcome="index" value="Inicio"/>
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>
+                        </f:facet>
+                        <f:facet name="right">
+                            <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                        </f:facet>
+                    </p:toolbar>
+
+                    <p:dataTable id="tabla1" var="actas" value="#{actasMb.list}" rows="10"
+                                 paginator="true" filteredValue="#{actasMb.filterList}" widgetVar="actasFilter" 
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" >
+                        <f:facet name="header">
+                            Lista de actas generadas                    
+                            <p:outputPanel>
+                                <h:outputText value="Buscar:" />
+                                <p:inputText id="globalFilter" onkeyup="PF('actasFilter').filter()" style="width:150px" placeholder="Ingrese valor a buscar"/>
+                            </p:outputPanel>
+                        </f:facet>
+                        <p:column headerText="Cédula" filterBy="#{actas.cedulaEstudiante.cedula}" filterMatchMode="contains" >
+                            <h:outputText value="#{actas.cedulaEstudiante.cedula}" />
+                        </p:column>
+                        <p:column headerText="Apellidos" >
+                            <h:outputText value="#{actas.cedulaEstudiante.apellidos}" />
+                        </p:column>
+                        <p:column headerText="Nombres" >
+                            <h:outputText value="#{actas.cedulaEstudiante.nombres}" />
+                        </p:column>
+                        <p:column headerText="N° Acta" filterBy="#{actas.numeroActaGrado}"  filterMatchMode="contains">
+                            <h:outputText value="#{actas.numeroActaGrado}" />
+                        </p:column>
+                        <p:column headerText="Editar Acta">
+                            <p:commandButton oncomplete="PF('editActa1').show()" update=":form1:actaEdit1" icon="ui-icon-pencil" title="Asignar Nota">
+                                <f:setPropertyActionListener value="#{actas}" target="#{actasMb.actaEditada.numActa}" /> 
+                                <f:setPropertyActionListener value="#{actas.promedioEstudios}" target="#{actasMb.actaEditada.promedioAnterior}" /> 
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dialog header="Editar Acta" widgetVar="editActa1" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                        <p:outputPanel id="actaEdit1" style="text-align:center;">
+                            <p:panelGrid  columns="3" rendered="#{not empty actasMb.actaEditada.numActa}" columnClasses="label,value">                                
+
+
+                                <h:outputText value="Motivo:" />
+                                <p:inputTextarea id="motivo" required="true" value="#{actasMb.actaEditada.motivo}" >
+                                    <f:validateLength minimum="10" maximum="50" for="motivo"/>
+                                </p:inputTextarea>
+                                <p:message for="motivo" />
+                                <h:outputText value="Promedio:" />
+                                <p:inputText id="noprome" required="true" value="#{actasMb.actaEditada.numActa.promedioEstudios}">
+                                    <f:validateDoubleRange minimum="7" maximum="10" for="noprome"/>
+                                    
+                                </p:inputText>
+                                <p:message for="noprome" />
+                                <f:facet name="footer">
+                                    <p:commandButton oncomplete="if (args &amp;&amp; !args.validationFailed) PF('editActa1').hide()" action="#{actasMb.guardarMotivo()}" update="tabla1 actaEdit1" validateClient="true"  icon="fa fa-save" title="Guardar">
+                                        <p:confirm header="Confirmacion" message="Estas seguro que desea editar el acta?" icon="ui-icon-alert" />
+                                    </p:commandButton>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                        <p:commandButton  value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </p:confirmDialog>
+                                    <p:commandButton onclick="PF('editActa1').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                                </f:facet>
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:dialog>
+                </h:form>
+            </h:body>
+        </c:when>
+        <c:otherwise >
+            <h1>Acceso denegado</h1>
+            <h1>Está página sólo la puede visualizar el abogado y administrador del sistema</h1>
+            <h2>Ud tiene acceso para visualizar las actas</h2>
+            <p:link  outcome="listado" value="Ver listado" />
+        </c:otherwise>
+    </c:choose>
+</html>
+

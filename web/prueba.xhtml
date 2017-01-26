@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form id="form" enctype="multipart/form-data">
+            <p:dataTable var="e" value="#{lazyView.lazyModel}" paginator="true" rows="10"
+                         paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                         rowsPerPageTemplate="5,10,15" selectionMode="single" selection="#{lazyView.selectedEstudiante}" id="carTable" lazy="true">
+                <p:ajax event="rowSelect" update=":form:carDetail" oncomplete="PF('carDialog').show()" />
+                <p:column headerText="Id" sortBy="#{e.cedula}" filterBy="#{e.cedula}">
+                    <h:outputText value="#{e.cedula}" />
+                </p:column>
+                <p:column headerText="Year" sortBy="#{e.apellidos}" filterBy="#{e.apellidos}">
+                    <h:outputText value="#{e.apellidos}" />
+                </p:column>
+
+            </p:dataTable>
+
+            <p:dialog header="Car Detail" widgetVar="carDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="carDetail" style="text-align:center;">
+                    <p:dataTable rendered="#{not empty lazyView.selectedEstudiante}" var="i" value="#{lazyView.selectedEstudiante}" paginator="true" rows="10"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 rowsPerPageTemplate="5,10,15" id="carTable1" lazy="true">
+                        <p:ajax event="rowSelect" update=":form:carDetail" oncomplete="PF('carDialog').show()" />
+                        <p:column headerText="Id" sortBy="#{i.cedula}" filterBy="#{i.cedula}">
+                            <h:outputText value="#{i.cedula}" />
+                        </p:column>
+                        <p:column headerText="Year" sortBy="#{i.apellidos}" filterBy="#{i.apellidos}">
+                            <h:outputText value="#{i .apellidos}" />
+                        </p:column>
+                        <p:column>
+                            <p:commandButton oncomplete="PF('carDialog1').show()" update=":form:carDetail1" icon="ui-icon-pencil" title="Mostrar" />
+                        </p:column>
+
+                    </p:dataTable>
+                </p:outputPanel>
+            </p:dialog>
+            <p:dialog header="Car Detail1" widgetVar="carDialog1" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="carDetail1" style="text-align:center;">
+                    <p:panelGrid  columns="2" rendered="#{not empty lazyView.selectedEstudiante}" columnClasses="label,value">                        
+
+                        <h:outputText value="Id:" />
+                        <h:outputText value="#{lazyView.selectedEstudiante.cedula}" />
+
+                        <h:outputText value="Year" />
+                        <h:outputText value="#{lazyView.selectedEstudiante.apellidos}" />
+
+                        <h:outputText value="Color:" />
+                        <h:outputText value="#{lazyView.selectedEstudiante.nombres}" style="color:#{dtLazyView.selectedCar.color}"/>
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+

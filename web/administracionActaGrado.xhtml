@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Actas</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="/css/estilos.css"/>        
+    </h:head>
+    <c:choose>
+        <c:when test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+
+            <h:body>
+                <p:growl id="mensajes" showDetail="true" life="2000" />
+                <h:form id="form1">
+                    <p:toolbar>
+                        <f:facet name="left">
+                            <p:outputLabel value="Bienvenido #{login.user}" />
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span> 
+                            <p:link outcome="index" value="Inicio"/>
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>
+                        </f:facet>
+                        <f:facet name="right">
+                            <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                        </f:facet>
+                    </p:toolbar>
+
+                    <br></br>
+                    <p:growl id="msgs" showDetail="true" />
+
+                    <p:panel id="actas" header="ADMINISTRACIÓN"  style="margin-bottom:20px; text-align: center">
+                        <h:form>  
+                            <p:growl id="messages"/>
+
+                            <p:menubar>
+                                <p:submenu label="Estudiantes" icon="ui-icon-document">
+                                    <p:menuitem value="Nuevo" icon="ui-icon-contact"/>    
+                                    
+                                    <p:menuitem value="Abrir" url="#" />
+                                    <p:separator />
+                                    <p:menuitem value="Listado" url="#" />
+                                </p:submenu>
+
+                                <p:submenu label="Editar" icon="ui-icon-pencil">
+                                    <p:menuitem value="Encabezado" url="#" icon="ui-icon-arrowreturnthick-1-w" />
+                                    <p:menuitem value="Cuerpo" url="#" icon="ui-icon-arrowreturnthick-1-e" />
+                                    <p:menuitem value="Pie de Página" url="#" icon="ui-icon-arrowreturnthick-1-e" />
+                                </p:submenu>
+
+                               
+
+                               
+                            </p:menubar>
+                        </h:form>
+
+                    </p:panel>
+
+
+
+
+                </h:form>
+            </h:body>
+        </c:when>
+    </c:choose>
+</html>

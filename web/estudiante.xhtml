@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Editar Estudiante</title>
+    </h:head>
+    <c:choose>
+        <c:when test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+            <h:body>
+                <p:growl id="mensajes" showDetail="true" life="2000" />
+                <h:form id="form"> 
+                    <p:toolbar>
+                        <f:facet name="left">
+                            <p:outputLabel value="Bienvenido #{login.user}" />
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>
+                            <p:link outcome="index" value="Inicio"/>
+                        </f:facet>
+                        <f:facet name="right">
+                            <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                        </f:facet>
+                    </p:toolbar>
+                    <br></br>
+                    <p:dataTable id="tabla" var="e" value="#{estudianteMb.listEstudiantes}" rows="10" 
+                                 paginator="true" filteredValue="#{estudianteMb.listFilter}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <p:column headerText="Cédula" filterBy="#{e.cedula}" filterMatchMode="contains" >
+                            <h:outputText value="#{e.cedula}" />
+                        </p:column>
+                        <p:column headerText="Nombres">
+                            <h:outputText value="#{e.nombres}" />
+                        </p:column>
+                        <p:column headerText="Apellidos">
+                            <h:outputText value="#{e.apellidos}" />
+                        </p:column>                       
+                        <p:column headerText="Género">
+                            <h:outputText value="#{e.genero}" />
+                        </p:column>
+                        <p:column headerText="Opción">
+                            <p:commandButton oncomplete="PF('editarEstudiante').show()" update=":form:estudianteEditar" icon="ui-icon-pencil" title="Editar" >
+                                <f:setPropertyActionListener value="#{e}" target="#{estudianteMb.selectedEstudiante}" />                                        
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                    <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+                    <p:dialog widgetVar="statusDialog" modal="false" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage  name="imagenes/ajax-loader.gif" />
+                    </p:dialog>
+                    <p:dialog header="Editar Estudiante" widgetVar="editarEstudiante" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                        <p:outputPanel id="estudianteEditar" style="text-align:center;">
+                            <h4>0 Masculino - 1 Femenino</h4>
+                            <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                            
+
+                                <h:outputText value="Cédula:" />
+                                <p:inputText value="#{estudianteMb.selectedEstudiante.cedula}" /> 
+                                <h:outputText value="Nombres:" />
+                                <p:inputText value="#{estudianteMb.selectedEstudiante.nombres}" />
+                                <h:outputText value="Apellidos:" />
+                                <p:inputText value="#{estudianteMb.selectedEstudiante.apellidos}" />
+                                <h:outputText value="Género:" />
+                                <p:selectOneMenu required="true" value="#{estudianteMb.selectedEstudiante.genero}">
+                                    <f:selectItem itemLabel="Femenino" itemValue="1" />
+                                    <f:selectItem itemLabel="Masculino" itemValue="0" />
+                                </p:selectOneMenu>                               
+
+                                <f:facet name="footer">
+                                    <p:commandButton oncomplete="PF('editarEstudiante').hide() " action="#{estudianteMb.editEstudiante()}" update=":mensajes tabla"  icon="fa fa-save" title="Guardar">
+                                        <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                    </p:commandButton>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                        <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes"  icon="fa fa-check" />
+                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </p:confirmDialog>
+                                    <p:commandButton onclick="PF('editarEstudiante').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                                </f:facet>
+                            </p:panelGrid>
+                        </p:outputPanel>
+                    </p:dialog>
+                   
+                </h:form>
+            </h:body>
+        </c:when>
+        <c:otherwise >
+
+            <h1>Acceso denegado</h1>
+            <h1>Está página sólo el administrador del sistema</h1>
+            <h2>Ud tiene acceso para visualizar las actas</h2>
+            <p:link  outcome="listado" value="Ver listado" />
+        </c:otherwise>
+    </c:choose>
+</html>
+

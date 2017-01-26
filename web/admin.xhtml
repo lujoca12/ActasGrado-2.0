@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <c:if test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+
+            <h:form>
+                <p:panel>
+                    <p:commandButton ajax="false" value="Volver a Generar Actas" action="#{generarMb.generarPDFS()}" />
+                </p:panel>
+
+
+                <p:menubar>
+                    <p:submenu label="Estudiante" icon="ui-icon-disk"  >
+                        <p:menuitem value="Editar" url="#"></p:menuitem>
+                        <p:menuitem value="Subir" url="#"></p:menuitem>
+                    </p:submenu>
+                    <p:submenu label="Facultad" icon="fa fa-university" >
+                        <p:menuitem value="Establecer secuencial" onclick="PF('estSecuencial').show();"></p:menuitem>
+                    </p:submenu>
+                    <p:submenu label="Unidad Titulación">
+                        <p:menuitem value="Registrar" onclick="PF('subirPeriodo').show();" ></p:menuitem>
+                    </p:submenu>
+                    <p:submenu label="Informes">
+                        <p:menuitem value="Generar" url="#" />                        
+                    </p:submenu>
+                    <p:submenu label="Usuarios">
+                        <p:menuitem value="Agregar" url="#" />                       
+                    </p:submenu>
+                    <p:submenu label="Actas">
+                        <p:menuitem value="Volver a imprimir" url="#" />
+                        <p:menuitem value="Editar" url="#" />
+                        <p:menuitem value="Generar todas" url="#" />  
+                    </p:submenu>
+                </p:menubar>
+                <p:dialog header="Agregar Periodo" widgetVar="subirPeriodo" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="periodoSubir" style="text-align:center;">
+                        <p:panelGrid  columns="2" columnClasses="label,value">      
+                            <p:outputLabel value="Denominacion Periodo: "/>
+                            <p:inputText value="#{estudianteMb.denominacion}" />
+
+                            <f:facet name="footer">  
+                                <p:commandButton onclick="PF('subirPeriodo').hide()" icon="fa fa-save" title="Guardar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+                <p:dialog header="Establecer secuencial" widgetVar="estSecuencial" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="secuencialEst" style="text-align:center;">
+                        <p:panelGrid  columns="2" columnClasses="label,value">
+                            <p:outputLabel value="Su secuencial anterior es: "/>
+                            <p:outputLabel value="#{login.usuario.idFacultad.secuencialActa}"/>
+                            <p:outputLabel value="Secuencial: "/>
+                            <p:inputText value="#{estudianteMb.secuencia}" />
+
+                            <f:facet name="footer">  
+                                <p:commandButton onclick="PF('estSecuencial').hide()" icon="fa fa-save" title="Guardar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+            </h:form>
+        </c:if>
+        <c:if test="#{login.usuario.idTipoUsuario.idTipoUsuario ne 1}" >
+            No autorizado 
+        </c:if>
+    </h:body>
+</html>
+

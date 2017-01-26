@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Generar Informe</title>
+    </h:head>
+    <h:body>
+        <p:dialog modal="true" widgetVar="statusDialog" header="Generando" draggable="false" closable="false" resizable="false">
+            <p:graphicImage name="imagenes/ajax-loading-bar.gif" />
+        </p:dialog>
+        <p:growl id="msg" sticky="false" life="1500" showDetail="true"/> 
+        <h:form binding="#{formComponent}">
+            <p:panel rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+                <h:panelGrid style=" margin: 0 auto; margin-top: 5%" columns="2"  cellpadding="5">
+                    <p:outputLabel for="facultad" value="Facultad:  " />
+                    <p:selectOneMenu id="facultad" value="#{combosMb.seleccionF}">
+                        <p:ajax listener="#{combosMb.onFacultadChange}" update="carrera" />
+                        <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{combosMb.facultad}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="carrera" value="Carrera:  " />
+                    <p:selectOneMenu id="carrera" value="#{combosMb.seleccionC}">
+                        <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{combosMb.carrera}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="estado" value="Estado:  " />
+                    <p:selectOneMenu id="estado" value="#{combosMb.seleccionO}">
+                        <p:ajax listener="#{combosMb.onEstadoChange}" update="tipoexamen" />
+                        <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{combosMb.opcion}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="tipoexamen" value="Tipo Examen:  " />
+                    <p:selectOneMenu id="tipoexamen" value="#{combosMb.seleccionT}">
+                        <p:ajax listener="#{combosMb.onTipoChange}" update="periodo" />
+                        <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{combosMb.tipoT}" />
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="periodo" value="Periodo:  " />
+                    <p:selectOneMenu id="periodo" value="#{combosMb.seleccionP}" style="width:125px">
+                        <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{combosMb.periodo}" />
+                    </p:selectOneMenu>
+
+
+                    <p:commandButton update="msg" value="Descargar" ajax="false" actionListener="#{combosMb.generarInforme()}" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
+                        <p:fileDownload value="#{combosMb.file}" />
+                    </p:commandButton>
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+        <script type="text/javascript">
+            function start() {
+                
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+        </script>
+        <ui:fragment rendered="#{login.usuario.idTipoUsuario.idTipoUsuario ne 1}">
+
+            Acceso no autorizado
+        </ui:fragment>
+    </h:body>
+</html>
+

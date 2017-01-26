@@ -1,0 +1,580 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Actas</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="/css/estilos.css"/>        
+    </h:head>
+
+
+    <h:body>
+        <div class="ui-g">
+
+            <p:growl id="mensajes" showDetail="true" life="2000" />
+            <h:form id="form" enctype="multipart/form-data" binding="#{formComponent}">
+                <p:toolbar>
+                    <f:facet name="left">
+                        <p:outputLabel value="Bienvenido #{login.usuario.usuario }" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                        <p:commandButton update="tabla valor1 valor2 valor3" id="movieBtn" value="Filtrar Estudiantes"  icon="fa fa-chevron-down" />  
+                        <br></br>
+                        <p:menubar>
+                            <p:submenu label="Estudiante" icon="ui-icon-disk"  >
+                                <p:menuitem value="Editar" icon="fa fa-edit" url="/upa/estudiante/" target="_blank" ></p:menuitem>
+                                <p:menuitem icon="fa fa-upload" rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}" value="Subir" url="/upa/uploadCsv/" target="_blank"></p:menuitem>
+                            </p:submenu>
+                            <p:submenu label="Facultad" icon="fa fa-university" >
+                                <p:menuitem icon="fa fa-check" value="Secuencial" onclick="PF('estSecuencial').show();" ></p:menuitem>                                
+                            </p:submenu>
+                            <p:submenu rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}" icon="fa fa-pencil" label="Unidad Titulación">
+                                <p:menuitem icon="ui-icon-document" value="Registrar" onclick="PF('subirPeriodo').show();" ></p:menuitem>
+                            </p:submenu>
+                            <p:submenu icon="fa fa-file" rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}"  label="Informes">
+                                <p:menuitem icon="fa fa-database" value="Generar" onclick="PF('estInforme').show()" />                        
+                            </p:submenu>
+                            <p:submenu icon="fa fa-file-pdf-o" label="Actas">
+                                <p:menuitem value="Editar" icon="fa fa-edit" url="/upa/editActa/" target="_blank" />
+                            </p:submenu>
+                            <p:submenu icon="fa fa-edit" label="Actas De Grado">
+                                <p:menuitem value="Crear" icon="fa fa-file-text-o" url="/upa/actaAprobacion/" target="_blank" />
+                                <p:menuitem value="Editar" icon="fa fa-edit" url="#" target="_blank" />
+                                <p:menuitem value="Eliminar" icon="ui-icon-trash" url="#" target="_blank" />
+                                <p:menuitem value="Administración" icon="fa fa-cog" url="/upa/administracionActaGrado/" target="_blank" />
+                            </p:submenu>
+
+                        </p:menubar>
+                    </f:facet>
+                    <f:facet name="right">
+                        <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                    </f:facet>
+                </p:toolbar>
+
+                <p:column >
+                    <p:outputLabel  value="Tipo de Titulacion:  "  />
+                    <p:outputLabel id="valor1"  value="#{estudianteMb.stringTipotit}"  />
+                </p:column>
+                <br></br>
+                <p:column>
+                    <p:outputLabel  value="Facultad:  "  />
+                    <p:outputLabel id="valor3" value="#{estudianteMb.titulo.idCarrera.idFacultad.facultad}" />
+                </p:column>
+                <br></br>
+                <p:column >
+                    <p:outputLabel  value="Titulo:  "  />
+                    <p:outputLabel id="valor2"  value="#{estudianteMb.titulo.titulo}" />
+                </p:column>
+
+                <p:overlayPanel modal="true"  id="moviePanel" for="movieBtn"  hideEffect="fade" dynamic="true" style="width:100%">                    
+                    <p:multiSelectListbox  value="#{estudianteMb.idTitulo}" effect="slide"  >
+                        <f:selectItems class="d" value="#{combosMb.categories}" />
+                    </p:multiSelectListbox>
+                    <p:column>
+                        <p:outputLabel for="periodo1" value="Periodo:  " />
+                        <p:selectOneMenu id="periodo1" value="#{estudianteMb.periodo}" >
+                            <f:selectItem itemLabel="--------------" itemValue="0" noSelectionOption="true" />
+                            <f:selectItems value="#{combosMb.periodoI}" />
+                        </p:selectOneMenu>
+                        <p:outputLabel for="tipoTitul" value="Tipo Titulacion:  " />
+                        <p:selectOneMenu id="tipoTitul" value="#{estudianteMb.idTipoTitulacion}" effect="slide" >
+                            <f:selectItem itemLabel="--------------" itemValue="0" noSelectionOption="true" />
+                            <f:selectItems value="#{combosMb.tipotitulacion}" />
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:overlayPanel>
+
+                <p:dataTable id="tabla" var="e" value="#{estudianteMb.list}" styleClass="stilo" widgetVar="estFilter" paginator="true" rows="20"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="20,40,80,100" selectionMode="single" selection="#{estudianteMb.selectedEstudiante}" lazy="true">
+                    <p:ajax event="rowSelect" update=":form:dialogEst" oncomplete="PF('estDialog').show()" />
+                    <p:column style="width:10%;" headerText="Apellidos" sortBy="#{e.apellidos}" filterBy="#{e.apellidos}" >
+                        <h:outputText value="#{e.apellidos}" />
+                    </p:column>
+
+                    <p:column style="width:10%;" headerText="Nombres" sortBy="#{e.nombres}" filterBy="#{e.nombres}" >
+                        <h:outputText value="#{e.nombres}" />
+                    </p:column>
+
+                    <p:column style="width:6%;" headerText="Cedula" sortBy="#{e.cedula}" filterBy="#{e.cedula}" >
+                        <h:outputText value="#{e.cedula}" />
+                    </p:column>
+                    <p:column style="width:4%;" headerText="Genero">
+
+                        <h:outputText rendered="#{e.genero eq '1'}" value="Femenino" />
+                        <h:outputText rendered="#{e.genero eq '0'}" value="Masculino" />
+                    </p:column>
+
+                    <c:choose>
+                        <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+
+                            <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                <p:outputLabel value="Asignar Nota" />
+                            </p:column>
+
+                            <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                <h:outputText value="#{e.actaGradoList.get(0).notaComplexivoGeneral}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+
+                    <c:choose>
+                        <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                            <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                <p:outputLabel value="Sin nota" />                                
+                            </p:column>
+
+                            <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                <h:outputText value="#{e.actaGradoList.get(0).notaComplexivoProfesional}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+
+                    <c:choose>
+                        <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                            <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaGeneral eq 0}" headerText="Nota Gracia General">
+                                <p:outputLabel value="Sin nota" />                                
+                            </p:column>
+
+                            <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaGeneral ne 0}" headerText="Nota Gracia General">
+                                <h:outputText value="#{e.actaGradoList.get(0).notaGraciaGeneral}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+
+                    <c:choose>
+                        <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                            <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaProfesional eq 0}" headerText="Nota Gracia Profesional">
+                                <p:outputLabel value="Sin nota" />
+                            </p:column>
+                            <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaProfesional ne 0}" headerText="Nota Gracia Profesional">
+                                <h:outputText value="#{e.actaGradoList.get(0).notaGraciaProfesional}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+
+                    <c:choose>
+                        <c:when test="#{estudianteMb.idTipoTitulacion == 3 and( login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                            <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                <p:commandButton oncomplete="PF('notaInvestigacion').show()" update=":form:investigacionNota" icon="ui-icon-pencil" title="Asignar Nota" />
+                            </p:column>
+                            <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                <h:outputText value="#{e.actaGradoList.get(0).notaTrabajoInvestigación}" />
+                            </p:column>
+                        </c:when>
+                    </c:choose>
+                    <p:column headerText="Promedio Estudios" style="width:4%;">
+                        <p:outputLabel rendered="#{(e.actaGradoList.get(0).promedioEstudios eq 0) and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" title="Asignar Nota" value="Sin nota" />                        
+                        <p:column rendered="${e.actaGradoList.get(0).promedioEstudios ne 0}" headerText="Nota Trabajo Investigacion">
+                            <h:outputText value="#{e.actaGradoList.get(0).promedioEstudios}" />
+                        </p:column>
+                    </p:column>   
+
+
+                    <p:column headerText="Actas" style="width:7%;" filterBy="#{e.actaGradoList}" >
+                        <f:facet name="filter" >
+                            <p:selectOneMenu onchange="PF('estFilter').filter()" >
+                                <f:converter converterId="javax.faces.Boolean" />
+                                <f:selectItem itemLabel="Todos" itemValue="" />
+                                <f:selectItem itemLabel="Generada" itemValue="true" />
+                                <f:selectItem itemLabel="No Generada" itemValue="false" />
+                            </p:selectOneMenu>
+
+                        </f:facet>
+                        <p:outputLabel rendered="#{!e.actaGradoList.get(0).actaGenerada and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" title="Acta no generada" value="Sin acta" />                        
+
+
+                        <p:button style="margin: 0px auto" rendered="#{e.actaGradoList.get(0).actaGenerada}" href="../recursos/${e.cedula}.pdf" target="_blank" icon="fa fa-eye" value="Ver" />                    
+                    </p:column>
+
+                    <p:column headerText="Evidencia" style="width:5%;">    
+                        <p:button style="margin: 0px auto" rendered="#{e.actaGradoList.get(0).actaBloqueada and e.actaGradoList.get(0).actaGenerada}" title="Ver Evidencia" href="../#{e.actaGradoList.get(0).evidencia}" target="_blank" icon="fa fa-eye" value="Ver"/>
+
+                        <p:outputLabel rendered="#{!e.actaGradoList.get(0).actaBloqueada and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" title="Evidencia no subida" value="Sin evidencia" />
+                    </p:column>
+                </p:dataTable>   
+
+
+                <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+                <p:dialog widgetVar="statusDialog" modal="false" draggable="false" closable="false" resizable="false" showHeader="false">
+                    <p:graphicImage  name="imagenes/ajax-loader.gif" />
+                </p:dialog>
+
+                <p:dialog header="Estudiante" widgetVar="estDialog" modal="true" showEffect="fade" width="50%"  positionType="absolute" hideEffect="fade"  resizable="false">
+                    <p:outputPanel id="dialogEst" style="text-align:center;">
+                        <p:dataTable styleClass="stilo" rendered="#{not empty estudianteMb.selectedEstudiante}" var="i" value="#{estudianteMb.selectedEstudiante}" rows="20"                                 
+                                     lazy="true" >
+                            <p:column style="width:6%;" headerText="Cedula"  >
+                                <h:outputText value="#{i.cedula}" />
+                            </p:column>
+                            <c:choose>
+                                <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+
+                                    <p:column style="width:5%;" rendered="${empty i.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                        <p:commandButton oncomplete="PF('complexivoGeneral').show()" update=":form:generalNota" icon="ui-icon-pencil" title="Asignar Nota" />
+                                    </p:column>
+
+                                    <p:column style="width:5%;" rendered="${not empty i.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                        <h:outputText value="#{i.actaGradoList.get(0).notaComplexivoGeneral}" />
+                                    </p:column>
+                                </c:when>
+                            </c:choose>
+
+                            <c:choose>
+                                <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                    <p:column style="width:5%;" rendered="${empty i.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                        <p:commandButton oncomplete="PF('complexivoProfesional').show()" update=":form:profesionalNota" icon="ui-icon-pencil" title="Asignar Nota" />                                
+                                    </p:column>
+
+                                    <p:column style="width:5%;" rendered="${not empty i.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                        <h:outputText value="#{i.actaGradoList.get(0).notaComplexivoProfesional}" />
+                                    </p:column>
+                                </c:when>
+                            </c:choose>
+
+                            <c:choose>
+                                <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                    <p:column style="width:5%;" rendered="${i.actaGradoList.get(0).notaGraciaGeneral eq 0}" headerText="Nota Gracia General">
+                                        <p:commandButton oncomplete="PF('graciaGeneral').show()" update=":form:graciagNota" icon="ui-icon-pencil" title="Asignar Nota" />                                
+                                    </p:column>
+
+                                    <p:column style="width:5%;" rendered="${i.actaGradoList.get(0).notaGraciaGeneral ne 0}" headerText="Nota Gracia General">
+                                        <h:outputText value="#{i.actaGradoList.get(0).notaGraciaGeneral}" />
+                                    </p:column>
+                                </c:when>
+                            </c:choose>
+
+                            <c:choose>
+                                <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                    <p:column style="width:5%;" rendered="${i.actaGradoList.get(0).notaGraciaProfesional eq 0}" headerText="Nota Gracia Profesional">
+                                        <p:commandButton oncomplete="PF('graciaProfesional').show()" update=":form:graciapNota" icon="ui-icon-pencil" title="Asignar Nota" />
+                                    </p:column>
+                                    <p:column style="width:5%;" rendered="${i.actaGradoList.get(0).notaGraciaProfesional ne 0}" headerText="Nota Gracia Profesional">
+                                        <h:outputText value="#{i.actaGradoList.get(0).notaGraciaProfesional}" />
+                                    </p:column>
+                                </c:when>
+                            </c:choose>
+
+                            <c:choose>
+                                <c:when test="#{estudianteMb.idTipoTitulacion == 3 and( login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                    <p:column style="width:5%;" rendered="${empty i.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                        <p:commandButton oncomplete="PF('notaInvestigacion').show()" update=":form:investigacionNota" icon="ui-icon-pencil" title="Asignar Nota" />
+                                    </p:column>
+                                    <p:column style="width:5%;" rendered="${not empty i.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                        <h:outputText value="#{i.actaGradoList.get(0).notaTrabajoInvestigación}" />
+                                    </p:column>
+                                </c:when>
+                            </c:choose>
+                            <p:column headerText="Promedio Estudios" style="width:4%;">
+                                <p:commandButton rendered="#{i.actaGradoList.get(0).promedioEstudios eq 0 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" oncomplete="PF('promedioEstudios').show()" update=":form:promedioNota" icon="ui-icon-pencil" title="Asignar Nota" />                        
+                                <p:column rendered="#{i.actaGradoList.get(0).promedioEstudios ne 0}" headerText="Nota Trabajo Investigacion">
+                                    <h:outputText value="#{i.actaGradoList.get(0).promedioEstudios}" />
+                                </p:column>
+                            </p:column>   
+
+
+                            <p:column headerText="Actas" style="width:7%;" >                                          
+                                <p:outputLabel rendered="#{!estudianteMb.getEstadoActa(i) and (i.actaGradoList.get(0).promedioEstudios eq 0) and ((login.usuario.idTipoUsuario.idTipoUsuario eq 2) or (login.usuario.idTipoUsuario.idTipoUsuario eq 1))}" title="Acta no generada" value="Sin acta" />                 
+                                <p:commandButton rendered="#{!estudianteMb.getEstadoActa(i) and (i.actaGradoList.get(0).promedioEstudios ne 0) and ((login.usuario.idTipoUsuario.idTipoUsuario eq 2) or (login.usuario.idTipoUsuario.idTipoUsuario eq 1))}" icon="fa fa-file-text" action="${estudianteMb.generarActa()}" update=":form:dialogEst :form:tabla"  title="Generar Acta" value="Generar Acta" />                        
+                                <p:button style="margin: 0px auto" rendered="#{estudianteMb.getEstadoActa(i)}" href="../recursos/${i.cedula}.pdf" target="_blank" icon="fa fa-eye" value="Ver" />                    
+                            </p:column>
+
+                            <p:column headerText="Evidencia" style="width:5%;">    
+                                <p:button style="margin: 0px auto" rendered="#{estudianteMb.getEstadoActaBloqueada(i) and estudianteMb.getEstadoActa(i)}" title="Ver Evidencia" href="../#{i.actaGradoList.get(0).evidencia}" target="_blank" icon="fa fa-eye" value="Ver"/>
+
+                                <p:commandButton rendered="#{!estudianteMb.getEstadoActaBloqueada(i) and estudianteMb.getEstadoActa(i) and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" oncomplete="PF('subirEvidencia').show()" update=":form:evidenciaSubir" icon="fa fa-upload" title="Subir evidencia" />
+
+                                <p:outputLabel rendered="#{!estudianteMb.getEstadoActaBloqueada(i) and !estudianteMb.getEstadoActa(i) and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}" title="Evidencia no subida" value="Sin evidencia" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Subir Evidencia" widgetVar="subirEvidencia" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="evidenciaSubir" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">      
+                            <p:fileUpload label="Seleccionar" cancelLabel="Cancelar" uploadLabel="Subir" oncomplete="PF('subirEvidencia').hide()"  
+                                          allowTypes="/(\.|\/)(pdf|jpg)$/"  invalidFileMessage="Archivo invalido" fileLimitMessage="Archivo muy pesado" 
+                                          fileLimit="1" sizeLimit="1000000" mode="advanced" skinSimple="true" fileUploadListener="#{estudianteMb.handleFileUpload}" 
+                                          update=":mensajes tabla dialogEst"/>
+                            <f:facet name="footer">                         
+
+                                <p:commandButton onclick="PF('subirEvidencia').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Fecha de Acto" widgetVar="fechaActo" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="generalFecha" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{estudianteMb.selectedEstudiante ne null}" columnClasses="label,value">                               
+
+                            <h:outputText value="Hora:" />
+                            <p:calendar id="time" value="#{estudianteMb.hora}" required="" pattern="HH:mm" timeOnly="true" lang="es" />
+
+                            <h:outputText value="Fecha:" />
+                            <p:calendar id="popup" value="#{estudianteMb.fecha}" required="" pattern="yyyy-MM-dd" lang="es" />
+
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('fechaActo').hide()" action="${estudianteMb.generarActa()}"  update="tabla dialogEst" icon="fa fa-save" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('fechaActo').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Complexivo General" widgetVar="complexivoGeneral" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="generalNota" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+                            <h:outputText value="Nota:" />
+                            <p:inputText value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).notaComplexivoGeneral}" />                      
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('complexivoGeneral').hide()" action="#{estudianteMb.guardarNota()}" update="tabla" icon="ui-icon-closethick" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('complexivoGeneral').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Complexivo Profesional" widgetVar="complexivoProfesional" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="profesionalNota" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+                            <h:outputText value="Nota:" />
+                            <p:inputText value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).notaComplexivoProfesional}" />                      
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('complexivoProfesional').hide()" action="#{estudianteMb.guardarNota()}" update="tabla" icon="ui-icon-closethick" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('complexivoProfesional').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Gracia General" widgetVar="graciaGeneral" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="graciagNota" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+                            <h:outputText value="Nota:" />
+                            <p:inputText value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).notaGraciaGeneral}" />                      
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('graciaGeneral').hide()" action="#{estudianteMb.guardarNota()}" update="tabla" icon="ui-icon-closethick" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-floppy" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('graciaGeneral').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Gracia Profesional" widgetVar="graciaProfesional" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="graciapNota" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+                            <h:outputText value="Nota:" />
+                            <p:inputText value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).notaGraciaProfesional}" />                      
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('graciaProfesional').hide()" action="#{estudianteMb.guardarNota()}" update="tabla" icon="ui-icon-closethick" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-floppy" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('graciaProfesional').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Trabajo Investigacion" widgetVar="notaInvestigacion" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="investigacionNota" style="text-align:center;">
+                        <p:panelGrid  columns="2" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+                            <h:outputText value="Nota:" />
+                            <p:inputText value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).notaTrabajoInvestigación}" />                      
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('notaInvestigacion').hide()" action="#{estudianteMb.guardarNota()}" update="tabla" icon="ui-icon-closethick" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-floppy" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('notaInvestigacion').hide()" icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Promedio Estudios"  widgetVar="promedioEstudios" modal="true" closable="false" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="promedioNota" style="text-align:center;">
+                        <p:panelGrid  columns="3" rendered="#{not empty estudianteMb.selectedEstudiante}" columnClasses="label,value">                                
+
+
+                            <h:outputText value="Promedio:" />
+                            <h:inputText id="notaPr" value="#{estudianteMb.selectedEstudiante.actaGradoList.get(0).promedioEstudios}" required="true" converterMessage="Error en los valores.">   
+                                <f:validateDoubleRange minimum="7" maximum="10"  for="notaPr"/>
+                                <p:ajax update="MNota" event="keyup" />
+                            </h:inputText>
+                            <p:message for="notaPr" id="MNota" />
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="if (args &amp;&amp; !args.validationFailed) PF('promedioEstudios').hide()" action="#{estudianteMb.guardarNota()}" validateClient="true" update="tabla dialogEst" icon="fa fa-save" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton  validateClient="true" value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('promedioEstudios').hide()"  icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="AgregarPeriodo" widgetVar="subirPeriodo" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="periodoSubir" style="text-align:center;">
+                        <p:panelGrid  columns="2" columnClasses="label,value">      
+                            <p:outputLabel value="Denominacion Periodo: "/>
+                            <p:inputText value="#{estudianteMb.denominacion}" />
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('subirPeriodo').hide()" action="#{estudianteMb.guardarPeriodo()}" validateClient="true" update="tabla periodoSubir" icon="fa fa-save" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton  validateClient="true" value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('subirPeriodo').hide()"  icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Establecer secuencial" widgetVar="estSecuencial" closable="false" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="secuencialEst" style="text-align:center;">
+                        <p:panelGrid  columns="2" columnClasses="label,value">
+                            <p:outputLabel value="Su secuencial actual es: "/>
+                            <p:outputLabel value="#{login.usuario.idFacultad.secuencialActa}"/>
+                            <p:outputLabel value="Secuencial: "/>
+                            <p:inputText value="#{estudianteMb.secuencia}" />
+
+                            <f:facet name="footer">
+                                <p:commandButton oncomplete="PF('estSecuencial').hide()" action="#{estudianteMb.guardarSecuencial()}" validateClient="true" update="tabla secuencialEst" icon="fa fa-save" title="Guardar">
+                                    <p:confirm header="Confirmacion" message="Estas seguro?" icon="ui-icon-alert" />
+                                </p:commandButton>
+                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                    <p:commandButton  validateClient="true" value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check" />
+                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                </p:confirmDialog>
+                                <p:commandButton onclick="PF('estSecuencial').hide()"  icon="ui-icon-closethick" title="Cancelar"/>
+                            </f:facet>
+                        </p:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+
+                <p:dialog header="Generar Informes" widgetVar="estInforme" closable="false" modal="true" showEffect="fade" hideEffect="explode" resizable="false">
+                    <p:outputPanel id="informeEst" style="text-align:center;">
+                        <p:panel rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+                            <h:panelGrid   columns="2"  cellpadding="5">
+                                <p:outputLabel for="facultad" value="Facultad:  " />
+                                <p:selectOneMenu id="facultad" value="#{combosMb.seleccionF}">
+                                    <p:ajax listener="#{combosMb.onFacultadChange}" update="carrera" />
+                                    <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{combosMb.facultad}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="carrera" value="Carrera:  " />
+                                <p:selectOneMenu id="carrera" value="#{combosMb.seleccionC}">
+                                    <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{combosMb.carrera}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="estado" value="Estado:  " />
+                                <p:selectOneMenu id="estado" value="#{combosMb.seleccionO}">
+                                    <p:ajax listener="#{combosMb.onEstadoChange}" update="tipoexamen" />
+                                    <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{combosMb.opcion}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="tipoexamen" value="Tipo Examen:  " />
+                                <p:selectOneMenu id="tipoexamen" value="#{combosMb.seleccionT}">
+                                    <p:ajax listener="#{combosMb.onTipoChange}" update="periodo" />
+                                    <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{combosMb.tipoT}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel for="periodo" value="Periodo:  " />
+                                <p:selectOneMenu id="periodo" value="#{combosMb.seleccionP}" style="width:125px">
+                                    <f:selectItem itemLabel="--------------" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{combosMb.periodo}" />
+                                </p:selectOneMenu>
+
+                                <f:facet name="footer">
+                                    <p:commandButton update="msg" value="Descargar" ajax="false" actionListener="#{combosMb.generarInforme()}" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
+                                        <p:fileDownload value="#{combosMb.file}" />
+                                    </p:commandButton>
+                                    <p:commandButton onclick="PF('estInforme').hide()"  icon="ui-icon-closethick" title="Cancelar"/>
+                                </f:facet>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:outputPanel>
+                </p:dialog>
+
+            </h:form>
+        </div>
+
+    </h:body>
+    <script type="text/javascript">
+        //<![CDATA[
+        function openPDF(xhr, status, args) {
+
+            //window.location = args.view;
+            window.open(args.view);
+        }
+        function actFocus() {
+            document.getElementById("tabla").autofocus;
+        }
+        //]]>
+    </script>
+
+
+</html>
+

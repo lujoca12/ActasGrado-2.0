@@ -1,0 +1,95 @@
+@charset "utf-8";
+/* CSS Document */
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 30/08/2016, 9:01:20
+    Author     : Moises
+*/
+
+.ui-multiselectlistbox-listcontainer{
+    width: 25% !important;
+}
+.stilo{
+    font-size: 13px !important;
+}
+
+.ui-multiselectlistbox .ui-multiselectlistbox-item {
+    white-space: normal !important;
+}
+
+.d{
+    color:green;
+}
+.login{
+    position: absolute; 
+    top: 30%; 
+    left: 35%;
+    width:30%;
+}
+
+
+
+.fondo{
+    background-color: #086516;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    outline: none;
+}
+.bodylogin {
+    background: #086516 no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.login-form {
+    margin: 100px auto;
+    max-width: 400px;
+}
+
+.formlog[role=login] {
+    font: 16px/1.6em Lato, serif;
+    background: #fff;
+    padding: 10px 0 0 0;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.formlog[role=login] h2 {
+    font-size: 26px;
+    color: #5d5c5c;
+    margin-bottom: 1em;
+}
+.formlog[role=login] input,
+.formlog[role=login] button,
+.formlog[role=login] a.btn {
+    font-size: 16px;
+}
+.formlog[role=login] > div {
+    line-height: 3em;
+    margin: 1.5em 0 0 0;
+    padding: 0 26px;
+    background: #f2f2f2;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    -webkit-border-bottom-left-radius: 10px;
+    -moz-border-radius-bottomleft: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -moz-border-radius-bottomright: 10px;
+}
+.formlog[role=login] > section {
+    padding: 0 26px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #fff;
+}

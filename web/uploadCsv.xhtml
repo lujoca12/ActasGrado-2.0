@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Subir Archivo</title>
+    </h:head>
+    <h:body>
+        <h:form enctype="multipart/form-data" >
+            <p:panel header="Subir Estudiantes" rendered="#{login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+                <p:panelGrid  style=" margin: 0px auto; margin-top: 2%" columns="1" columnClasses="label,value">
+                    <p:growl id="mensajes1" showDetail="true" life="2000" />
+
+
+                    <p:selectOneMenu value="#{cSVMb.examenComplexivo}">
+                        <f:selectItem itemLabel="-------------" itemValue="0" noSelectionOption="true"/>
+                        <f:selectItems value="#{cSVMb.periodos}"/>      
+                        <p:ajax update="valor4"/>
+                    </p:selectOneMenu>
+                    <p:inputText type="hidden" id="valor4" value="#{cSVMb.examenComplexivo}" />
+                    <p:outputPanel id="evidenciaSubir" style="text-align:center;">
+
+                        <p:fileUpload label="Seleccionar" cancelLabel="Cancelar" uploadLabel="Subir"   
+                                      allowTypes="/(\.|\/)(csv)$/"  invalidFileMessage="Archivo invalido" fileLimitMessage="Archivo muy pesado" 
+                                      fileLimit="1" sizeLimit="1000000" mode="advanced" skinSimple="true" fileUploadListener="#{cSVMb.handleFileUpload}" 
+                                      update="mensajes1"/>
+
+
+                    </p:outputPanel>
+
+                </p:panelGrid>
+            </p:panel>
+        </h:form>
+        <ui:fragment rendered="#{login.usuario.idTipoUsuario.idTipoUsuario ne 1}">
+
+            Acceso no autorizado
+        </ui:fragment>
+    </h:body>
+</html>
+

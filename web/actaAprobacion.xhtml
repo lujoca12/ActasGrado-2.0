@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>Actas</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet name="/css/estilos.css"/>        
+    </h:head>
+    <c:choose>
+        <c:when test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
+
+            <h:body>
+                <p:growl id="mensajes" showDetail="true" life="2000" />
+                <h:form id="form1">
+                    <p:toolbar>
+                        <f:facet name="left">
+                            <p:outputLabel value="Bienvenido #{login.user}" />
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span> 
+                            <p:link outcome="index" value="Inicio"/>
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>
+                        </f:facet>
+                        <f:facet name="right">
+                            <p:commandButton id="withIcon"  actionListener="#{login.logout}" value="Cerrar Sesión" icon="fa fa-sign-out" />
+                        </f:facet>
+                    </p:toolbar>
+                    <br></br>
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:panel id="actas" header="Generación de Acta de Grado"  style="margin-bottom:20px; text-align: center">
+                        <h:panelGrid columns="1" cellpadding="1" style="text-align: justify">
+
+                            <p:commandButton update="tabla1 valor4 valor5 valor6" id="movieBtn1" value="Escoja los Estudiantes"  icon="fa fa-chevron-down" />  
+
+
+                            <p:overlayPanel modal="true"  id="moviePanel" for="movieBtn1"  hideEffect="fade" dynamic="true" style="width:95%">                    
+                                <p:multiSelectListbox  value="#{estudianteMb.idTitulo}" effect="slide"  >
+                                    <f:selectItems class="d" value="#{combosMb.categories}" />
+                                </p:multiSelectListbox>
+                                <p:column>
+                                    <p:outputLabel for="periodo1" value="Periodo:  "/>
+                                    <p:selectOneMenu id="periodo1" value="#{estudianteMb.periodo}" >
+                                        <f:selectItem itemLabel="--------------" itemValue="0" noSelectionOption="true" />
+                                        <f:selectItems value="#{combosMb.periodoI}" />
+                                    </p:selectOneMenu>
+                                    <p:outputLabel for="tipoTitul" value="Tipo Titulacion:  " />
+                                    <p:selectOneMenu id="tipoTitul" value="#{estudianteMb.idTipoTitulacion}" effect="slide" >
+                                        <f:selectItem itemLabel="--------------" itemValue="0" noSelectionOption="true" />
+                                        <f:selectItems value="#{combosMb.tipotitulacion}" />
+                                    </p:selectOneMenu>
+                                </p:column>
+                            </p:overlayPanel>
+
+
+
+
+                            <p:column>
+                                <p:outputLabel style="font-weight:bold" value="Facultad:  "  />
+                                <p:outputLabel id="valor5" value="#{estudianteMb.titulo.idCarrera.idFacultad.facultad}" />
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel style="font-weight:bold" value="Título:  "  />
+                                <p:outputLabel id="valor6"  value="#{estudianteMb.titulo.titulo}" />
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel style="font-weight:bold" value="Tipo de Titulación:  "  />
+                                <p:outputLabel id="valor4"  value="#{estudianteMb.stringTipotit}"  />
+                            </p:column>
+
+
+
+
+                            <p:dataTable id="tabla1" var="e" value="#{estudianteMb.list}" styleClass="stilo" widgetVar="estFilter" paginator="true" rows="20"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="20,40,80,100" selectionMode="single" selection="#{estudianteMb.selectedEstudiante}" lazy="true">
+
+                                <p:ajax event="rowSelect" update=":form1:dialogEst" oncomplete="PF('estDialog').show()" />
+
+
+
+                                <p:column style="width:10%;" headerText="Apellidos" sortBy="#{e.apellidos}" filterBy="#{e.apellidos}" >
+                                    <h:outputText value="#{e.apellidos}" />
+                                </p:column>
+
+                                <p:column style="width:10%;" headerText="Nombres" sortBy="#{e.nombres}" filterBy="#{e.nombres}" >
+                                    <h:outputText value="#{e.nombres}" />
+                                </p:column>
+
+                                <p:column style="width:6%;" headerText="Cedula" sortBy="#{e.cedula}" filterBy="#{e.cedula}" >
+                                    <h:outputText value="#{e.cedula}" />
+                                </p:column>
+                                <p:column style="width:4%;" headerText="Genero">
+
+                                    <h:outputText rendered="#{e.genero eq '1'}" value="Femenino" />
+                                    <h:outputText rendered="#{e.genero eq '0'}" value="Masculino" />
+                                </p:column>
+
+                                <c:choose>
+                                    <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+
+                                        <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                            <p:outputLabel value="Asignar Nota" />
+                                        </p:column>
+
+                                        <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaComplexivoGeneral}" headerText="Nota Complexivo General">
+                                            <h:outputText value="#{e.actaGradoList.get(0).notaComplexivoGeneral}" />
+                                        </p:column>
+                                    </c:when>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="#{estudianteMb.idTipoTitulacion == 1 || estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                        <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                            <p:outputLabel value="Sin nota" />                                
+                                        </p:column>
+
+                                        <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaComplexivoProfesional}" headerText="Nota Complexivo Profesional">
+                                            <h:outputText value="#{e.actaGradoList.get(0).notaComplexivoProfesional}" />
+                                        </p:column>
+                                    </c:when>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                        <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaGeneral eq 0}" headerText="Nota Gracia General">
+                                            <p:outputLabel value="Sin nota" />                                
+                                        </p:column>
+
+                                        <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaGeneral ne 0}" headerText="Nota Gracia General">
+                                            <h:outputText value="#{e.actaGradoList.get(0).notaGraciaGeneral}" />
+                                        </p:column>
+                                    </c:when>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="#{estudianteMb.idTipoTitulacion == 2 and (login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                        <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaProfesional eq 0}" headerText="Nota Gracia Profesional">
+                                            <p:outputLabel value="Sin nota" />
+                                        </p:column>
+                                        <p:column style="width:5%;" rendered="${e.actaGradoList.get(0).notaGraciaProfesional ne 0}" headerText="Nota Gracia Profesional">
+                                            <h:outputText value="#{e.actaGradoList.get(0).notaGraciaProfesional}" />
+                                        </p:column>
+                                    </c:when>
+                                </c:choose>
+
+                                <c:choose>
+                                    <c:when test="#{estudianteMb.idTipoTitulacion == 3 and( login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1)}">
+                                        <p:column style="width:5%;" rendered="${empty e.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                            <p:commandButton oncomplete="PF('notaInvestigacion').show()" update=":form:investigacionNota" icon="ui-icon-pencil" title="Asignar Nota" />
+                                        </p:column>
+                                        <p:column style="width:5%;" rendered="${not empty e.actaGradoList.get(0).notaTrabajoInvestigación}" headerText="Nota Trabajo Investigacion">
+                                            <h:outputText value="#{e.actaGradoList.get(0).notaTrabajoInvestigación}" />
+                                        </p:column>
+                                    </c:when>
+                                </c:choose>
+
+                            </p:dataTable>
+
+
+
+                            <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                            <p:dialog widgetVar="statusDialog" modal="false" draggable="false" closable="false" resizable="false" showHeader="false">
+                                <p:graphicImage  name="imagenes/ajax-loader.gif" />
+                            </p:dialog>
+
+
+
+
+
+                            <p:dialog header="Creación de Actas" widgetVar="estDialog" modal="true" showEffect="fade" width="50%"  positionType="absolute" hideEffect="fade"  resizable="false">
+                                <p:outputPanel id="dialogEst" style="text-align:center;">
+                                    <p:dataTable styleClass="stilo" rendered="#{not empty estudianteMb.selectedEstudiante}" var="i" value="#{estudianteMb.selectedEstudiante}" rows="20"                                 
+                                                 lazy="true" >
+
+                                        <p:column style="width:10%;" headerText="Apellidos">
+                                            <h:outputText value="#{i.apellidos}" />
+                                        </p:column>
+
+                                        <p:column style="width:10%;" headerText="Nombres">
+                                            <h:outputText value="#{i.nombres}" />
+                                        </p:column>
+
+                                        <p:column style="width:6%;" headerText="Cedula"  >
+                                            <h:outputText value="#{i.cedula}" />
+                                        </p:column>
+                                        <p:column style="width:6%;" headerText="Acción"  >
+                                        <p:commandButton id="CrearActa"  value="Crear" icon="" />
+                                        </p:column>
+                                        
+                                        
+                                        
+                                    </p:dataTable>
+                                </p:outputPanel>
+                            </p:dialog>
+
+
+
+                        </h:panelGrid>
+                    </p:panel>
+
+
+
+                </h:form>
+            </h:body>
+
+            <script type="text/javascript">
+                //<![CDATA[
+                function openPDF(xhr, status, args) {
+
+                    //window.location = args.view;
+                    window.open(args.view);
+                }
+                function actFocus() {
+                    document.getElementById("tabla1").autofocus;
+                }
+                //]]>
+            </script>
+
+
+        </c:when>
+    </c:choose>
+</html>
