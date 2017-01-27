@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.inject.Named;
@@ -41,6 +42,7 @@ import javax.servlet.ServletContext;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.uteq.model.DenominacionTitulo;
 import org.uteq.model.ExamenComplexivo;
@@ -113,7 +115,16 @@ public class EstudianteMb implements Serializable {
     private static final String rutaImg = "\\imagenes";
     private static final String rutaPdf = "\\recursos";
     private static final String rutaFuentes = "\\fuentes";
+    private StreamedContent media;
 
+    public StreamedContent getMedia() {
+        return media;
+    }
+
+    public void setMedia(StreamedContent media) {
+        this.media = media;
+    }
+    
     public String getSecuencia() {
         return secuencia;
     }
@@ -280,6 +291,11 @@ public class EstudianteMb implements Serializable {
         autoridad = new String();
         secretario = new String();
         selectedEstudiante = null;
+    }
+    
+    @PostConstruct
+    public void load() {
+        media = null;
     }
 
     public void handleFileUpload(FileUploadEvent event) {
@@ -507,7 +523,7 @@ public class EstudianteMb implements Serializable {
             //PdfWriter.getInstance(document, fileOutputStream);
             document.open();
             Image image = null;
-            image = Image.getInstance(ruta + rutaImg + "\\logoUTEQ.png");
+            image = Image.getInstance(ruta + "imagenes" + "\\logoUTEQ.png");
             image.setAlignment(Image.ALIGN_LEFT);
             image.scaleAbsolute(50, 50);
             BaseFont baseFont = BaseFont.createFont(ruta + rutaFuentes + "\\Arial Narrow.ttf", BaseFont.WINANSI, true);
@@ -898,7 +914,7 @@ public class EstudianteMb implements Serializable {
                 //PdfWriter.getInstance(document, fileOutputStream);
                 document.open();
                 Image image = null;
-                image = Image.getInstance(ruta + rutaImg + "\\logoUTEQ.png");
+                image = Image.getInstance(ruta + "imagenes" + "\\logoUTEQ.png");
                 image.setAlignment(Image.ALIGN_LEFT);
                 image.scaleAbsolute(50, 50);
                 BaseFont baseFont = BaseFont.createFont(ruta + rutaFuentes + "\\Arial Narrow.ttf", BaseFont.WINANSI, true);
@@ -1174,6 +1190,13 @@ public class EstudianteMb implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se editó el acta"));
         }
+    }
+    
+    public void cargarReporte(){
+        media = null;
+//        DaoRepActaEmision daoReport = new DaoRepActaEmision();
+//        if(themePromociones != null && themeMaestria != null)
+//           media = daoReport.reporte(this.themePromociones.getId(), themeMaestria.getId());
     }
 
     public String getAutoridad() {

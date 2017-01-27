@@ -17,6 +17,7 @@ and open the template in the editor.
         <h:outputStylesheet name="/css/estilos.css"/>        
     </h:head>
     <c:choose>
+        <p:remoteCommand name="form" autoRun="true" action="#{estudianteMb.load()}" />
         <c:when test="#{login.usuario.idTipoUsuario.idTipoUsuario eq 2 or login.usuario.idTipoUsuario.idTipoUsuario eq 1}">
 
             <h:body>
@@ -196,7 +197,7 @@ and open the template in the editor.
                                             <h:outputText value="#{i.cedula}" />
                                         </p:column>
                                         <p:column style="width:6%;" headerText="Acción"  >
-                                        <p:commandButton id="CrearActa"  value="Crear" icon="" />
+                                            <p:commandButton id="CrearActa" actionListener="#{estudianteMb.generarActa}" value="Crear" icon="" />
                                         </p:column>
                                         
                                         
